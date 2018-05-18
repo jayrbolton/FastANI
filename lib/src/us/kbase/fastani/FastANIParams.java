@@ -23,17 +23,14 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 @Generated("com.googlecode.jsonschema2pojo")
 @JsonPropertyOrder({
     "workspace_name",
-    "query_assembly_refs",
-    "reference_assembly_refs"
+    "assembly_refs"
 })
 public class FastANIParams {
 
     @JsonProperty("workspace_name")
     private java.lang.String workspaceName;
-    @JsonProperty("query_assembly_refs")
-    private List<String> queryAssemblyRefs;
-    @JsonProperty("reference_assembly_refs")
-    private List<String> referenceAssemblyRefs;
+    @JsonProperty("assembly_refs")
+    private List<String> assemblyRefs;
     private Map<java.lang.String, Object> additionalProperties = new HashMap<java.lang.String, Object>();
 
     @JsonProperty("workspace_name")
@@ -51,33 +48,18 @@ public class FastANIParams {
         return this;
     }
 
-    @JsonProperty("query_assembly_refs")
-    public List<String> getQueryAssemblyRefs() {
-        return queryAssemblyRefs;
+    @JsonProperty("assembly_refs")
+    public List<String> getAssemblyRefs() {
+        return assemblyRefs;
     }
 
-    @JsonProperty("query_assembly_refs")
-    public void setQueryAssemblyRefs(List<String> queryAssemblyRefs) {
-        this.queryAssemblyRefs = queryAssemblyRefs;
+    @JsonProperty("assembly_refs")
+    public void setAssemblyRefs(List<String> assemblyRefs) {
+        this.assemblyRefs = assemblyRefs;
     }
 
-    public FastANIParams withQueryAssemblyRefs(List<String> queryAssemblyRefs) {
-        this.queryAssemblyRefs = queryAssemblyRefs;
-        return this;
-    }
-
-    @JsonProperty("reference_assembly_refs")
-    public List<String> getReferenceAssemblyRefs() {
-        return referenceAssemblyRefs;
-    }
-
-    @JsonProperty("reference_assembly_refs")
-    public void setReferenceAssemblyRefs(List<String> referenceAssemblyRefs) {
-        this.referenceAssemblyRefs = referenceAssemblyRefs;
-    }
-
-    public FastANIParams withReferenceAssemblyRefs(List<String> referenceAssemblyRefs) {
-        this.referenceAssemblyRefs = referenceAssemblyRefs;
+    public FastANIParams withAssemblyRefs(List<String> assemblyRefs) {
+        this.assemblyRefs = assemblyRefs;
         return this;
     }
 
@@ -93,7 +75,7 @@ public class FastANIParams {
 
     @Override
     public java.lang.String toString() {
-        return ((((((((("FastANIParams"+" [workspaceName=")+ workspaceName)+", queryAssemblyRefs=")+ queryAssemblyRefs)+", referenceAssemblyRefs=")+ referenceAssemblyRefs)+", additionalProperties=")+ additionalProperties)+"]");
+        return ((((((("FastANIParams"+" [workspaceName=")+ workspaceName)+", assemblyRefs=")+ assemblyRefs)+", additionalProperties=")+ additionalProperties)+"]");
     }
 
 }

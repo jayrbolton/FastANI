@@ -37,8 +37,8 @@ class FastANI(object):
         """
         :param params: instance of type "FastANIParams" (fast_ani input) ->
            structure: parameter "workspace_name" of String, parameter
-           "query_assembly_refs" of list of String, parameter
-           "reference_assembly_refs" of list of String
+           "assembly_refs" of list of type "workspace_ref" (@id ws
+           KBaseGenomeAnnotations.Assembly)
         :returns: instance of type "FastANIResults" (fast_ani output) ->
            structure: parameter "report_name" of String, parameter
            "report_ref" of String

@@ -3,3 +3,4 @@ sdk.cfg
 *.pyc
 *.py.bak*
 .env
+.mypy_cache

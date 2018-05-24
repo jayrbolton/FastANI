@@ -1,4 +1,4 @@
-FROM jjeffryes/kbasepythonsdk:latest
+FROM kbase/kbase:sdkbase2.latest
 MAINTAINER Jay R Bolton <jrbolton@lbl.gov>
 
 # -----------------------------------------
@@ -21,16 +21,20 @@ RUN apt-get install -y r-base \
     && Rscript -e "install.packages('genoPlotR', repos='http://cran.us.r-project.org')"
 
 # Update security deps
-RUN pip install -U pip jinja2==2.10.*
+RUN pip install -U pip
+RUN pip install \
+    cffi pyopenssl ndg-httpsclient pyasn1 requests 'requests[security]'
+
+# Install pip deps
+RUN pip install jinja2==2.10.* functools32
 
 # End app-specific dependencies
 # -----------------------------------------
 
-COPY ./ /kb/module
 WORKDIR /kb/module
+COPY ./ /kb/module
 RUN mkdir -p /kb/module/work
 RUN chmod -R a+rw /kb/module
 RUN make all
-
 ENTRYPOINT [ "./scripts/entrypoint.sh" ]
 CMD [ ]

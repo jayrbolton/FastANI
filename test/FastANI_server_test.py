@@ -4,6 +4,7 @@ import os
 import time
 import subprocess
 import tempfile
+import shutil
 
 from os import environ
 try:
@@ -17,7 +18,7 @@ from FastANI.FastANIServer import MethodContext
 from FastANI.authclient import KBaseAuth as _KBaseAuth
 
 from AssemblyUtil.AssemblyUtilClient import AssemblyUtil
-from shutil import copyfile
+from mock_clients import mock_assembly_utils, mock_kbase_report, stop_mocks
 
 
 class FastANITest(unittest.TestCase):
@@ -51,12 +52,23 @@ class FastANITest(unittest.TestCase):
         cls.serviceImpl = FastANI(cls.cfg)
         cls.scratch = cls.cfg['scratch']
         cls.callback_url = os.environ['SDK_CALLBACK_URL']
+        cls.base_dir = os.path.dirname(__file__)
+        # Set up test data; copy it to scratch
+        source_path1 = os.path.join(cls.base_dir, 'data', 'ecoli.fna')
+        source_path2 = os.path.join(cls.base_dir, 'data', 'shigella.fna')
+        cls.test_path1 = os.path.join(cls.scratch, 'ecoli.fna')
+        cls.test_path2 = os.path.join(cls.scratch, 'shigella.fna')
+        shutil.copy2(source_path1, cls.test_path1)
+        shutil.copy2(source_path2, cls.test_path2)
+        mock_assembly_utils([cls.test_path1, cls.test_path2])
+        mock_kbase_report()
 
     @classmethod
     def tearDownClass(cls):
         if hasattr(cls, 'wsName'):
             cls.wsClient.delete_workspace({'workspace': cls.wsName})
             print('Test workspace was deleted')
+        stop_mocks()
 
     def getWsClient(self):
         return self.__class__.wsClient
@@ -76,6 +88,9 @@ class FastANITest(unittest.TestCase):
     def getContext(self):
         return self.__class__.ctx
 
+    def mock_upload(params):
+        print('mock side effect', params)
+
     def load_fasta_file(self, path, name):
         assembly_util = AssemblyUtil(self.callback_url)
         return assembly_util.save_assembly_from_fasta({
@@ -84,6 +99,7 @@ class FastANITest(unittest.TestCase):
             'assembly_name': name
         })
 
+    @unittest.skip('x')
     def test_fastani_binary(self):
         """
         Run the compiled binary using the given example data
@@ -105,23 +121,42 @@ class FastANITest(unittest.TestCase):
         self.assertTrue(os.path.isfile(out_path))
         return
 
+    @unittest.skip('')
     def test_run_fast_ani(self):
         """
         Test a basic call to FastANIImpl#fast_ani using a query and reference assembly
         Copy the FastANI example data into the scratch dir
         """
+        # Set up some test files
         a_path = os.path.join(self.scratch, 'a.fna')
         b_path = os.path.join(self.scratch, 'b.fna')
-        data_dir = os.path.join(os.path.dirname(__file__), 'data')
-        copyfile(os.path.join(data_dir, 'shigella.fna'), a_path)
-        copyfile(os.path.join(data_dir, 'ecoli.fna'), b_path)
+        base_dir = os.path.dirname(__file__)
+        a_source_path = os.path.join(base_dir, 'data', 'ecoli.fna')
+        b_source_path = os.path.join(base_dir, 'data', 'shigella.fna')
+        shutil.copy2(a_source_path, a_path)
+        shutil.copy2(b_source_path, b_path)
         a_ref = self.load_fasta_file(a_path, 'test_assembly_a')
         b_ref = self.load_fasta_file(b_path, 'test_assembly_b')
-        refs = [a_ref, b_ref]
+        # Run FastANIImpl.fast_ani
         results = self.getImpl().fast_ani(self.getContext(), {
             'workspace_name': self.getWsName(),
-            'assembly_refs': refs
+            'assembly_refs': [a_ref, b_ref]
         })
-        print('Results:', results)
         self.assertTrue(len(results[0]['report_name']))
         self.assertTrue(len(results[0]['report_ref']))
+        os.listdir(self.scratch)
+
+    def test_run_fast_ani_mocked(self):
+        """
+        Test a basic call to FastANIImpl#fast_ani using a query and reference assembly
+        Copy the FastANI example data into the scratch dir
+        """
+        a_ref = self.load_fasta_file(self.test_path1, 'test_assembly_a')
+        b_ref = self.load_fasta_file(self.test_path2, 'test_assembly_b')
+        results = self.getImpl().fast_ani(self.getContext(), {
+            'workspace_name': self.getWsName(),
+            'assembly_refs': [a_ref, b_ref]
+        })
+        self.assertTrue(len(results[0]['report_name']))
+        self.assertTrue(len(results[0]['report_ref']))
+        os.listdir(self.scratch)

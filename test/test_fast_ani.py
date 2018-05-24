@@ -13,11 +13,12 @@ from utils.fast_ani_proc import run_fast_ani_pairwise  # noqa
 
 class TestFastANI(unittest.TestCase):
 
+    @unittest.skip('x')
     def test_fast_ani_proc_and_output(self):
         data_dir = os.path.join(dirname, 'data')
         path1 = os.path.join(data_dir, 'shigella.fna')
         path2 = os.path.join(data_dir, 'ecoli.fna')
-        print(path1, path2)
+        # print(path1, path2)
         self.assertTrue(os.path.isfile(path1))
         self.assertTrue(os.path.isfile(path2))
         tmp_dir = tempfile.mkdtemp()
@@ -27,13 +28,13 @@ class TestFastANI(unittest.TestCase):
             os.path.join(tmp_dir, 'shigella-ecoli.out')
         ]))
         result_data = get_result_data(out_paths)
-        print(result_data)
+        # print(result_data)
         self.assertEqual(len(result_data), 2)
         self.assertEqual(result_data[0]['orthologous_matches'], '1324')
         self.assertEqual(result_data[0]['percentage_match'], '97.6765')
         self.assertEqual(result_data[0]['total_fragments'], '1547')
         html = create_html_tables(result_data)
-        print(html)
+        # print(html)
         self.assertGreater(len(html), 0)
 
 

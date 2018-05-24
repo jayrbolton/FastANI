@@ -25,7 +25,7 @@ class FastANI:
     ######################################### noqa
     VERSION = "0.0.1"
     GIT_URL = "https://github.com/jayrbolton/kbase-fastANI.git"
-    GIT_COMMIT_HASH = "f842fbf019545ab417a20e6ffd224cc87b24f0a6"
+    GIT_COMMIT_HASH = "f8ecae6d5b2b9edc9f6331292706b2d5bb3d4159"
 
     #BEGIN_CLASS_HEADER
     #END_CLASS_HEADER
@@ -53,7 +53,7 @@ class FastANI:
         # ctx is the context object
         # return variables are: results
         #BEGIN fast_ani
-        print 'Starting FastANI function and validating parameters.'
+        print('Starting FastANI function and validating parameters.')
         for name in ['workspace_name', 'assembly_refs']:
             if name not in params:
                 raise ValueError('Parameter "' + name + '" is not set in input arguments')

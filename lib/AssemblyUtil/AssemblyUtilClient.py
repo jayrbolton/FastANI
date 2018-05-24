@@ -16,6 +16,36 @@ except:
     # no they aren't
     from baseclient import BaseClient as _BaseClient  # @Reimport
 import time
+import os
+import functools32
+import pickle
+import hashlib
+
+
+def cache(function):
+    """ Memoize a method to run a remote job by caching to disk """
+    fn_name = function.__name__
+    mem_dir = os.path.join(os.sep, 'kb', 'module', 'work', 'tmp', '.mem', fn_name)
+    if not os.path.isdir(mem_dir):
+        os.makedirs(mem_dir)
+
+    @functools32.wraps(function)
+    def wrapper(*args, **kwargs):
+        if not os.getenv('CACHE'):
+            return function(*args, **kwargs)
+        hashed_args = ['%s' % hash(arg) for arg in args]
+        hashed_kwargs = ['%s ' % hash((key, value)) for (key, value) in kwargs.items()]
+        hashed = hashlib.md5(':'.join(hashed_args + hashed_kwargs)).hexdigest()
+        cache_path = os.path.join(mem_dir, hashed)
+        if os.path.exists(cache_path):
+            with open(cache_path, 'rb') as f:
+                result = pickle.load(f)
+        else:
+            result = function(*args, **kwargs)
+            with open(cache_path, 'wb') as f:
+                pickle.dump(result, f)
+        return result
+    return wrapper
 
 
 class AssemblyUtil(object):
@@ -24,7 +54,7 @@ class AssemblyUtil(object):
             self, url=None, timeout=30 * 60, user_id=None,
             password=None, token=None, ignore_authrc=False,
             trust_all_ssl_certificates=False,
-            auth_svc='https://kbase.us/services/authorization/Sessions/Login',
+            auth_svc='https://ci.kbase.us/services/auth/api/legacy/KBase/Sessions/Login',
             service_ver='release',
             async_job_check_time_ms=100, async_job_check_time_scale_percent=150, 
             async_job_check_max_time_ms=300000):
@@ -48,6 +78,7 @@ class AssemblyUtil(object):
              'AssemblyUtil.get_assembly_as_fasta', [params],
              self._service_ver, context)
 
+    @cache
     def get_assembly_as_fasta(self, params, context=None):
         """
         Given a reference to an Assembly (or legacy ContigSet data object), along with a set of options,
@@ -69,6 +100,7 @@ class AssemblyUtil(object):
                 async_job_check_time = self._client.async_job_check_max_time
             job_state = self._check_job(job_id)
             if job_state['finished']:
+                r = job_state['result'][0]
                 return job_state['result'][0]
 
     def _export_assembly_as_fasta_submit(self, params, context=None):

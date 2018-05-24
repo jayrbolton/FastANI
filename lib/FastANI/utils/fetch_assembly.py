@@ -1,4 +1,4 @@
-import multiprocessing
+# import multiprocessing
 from AssemblyUtil.AssemblyUtilClient import AssemblyUtil
 
 # Fetch genome assemblies in parallel
@@ -12,13 +12,19 @@ def fetch_multiple(callback_url, refs):
     :returns: array of file paths of fetched assemblies
     """
     assembly_util = AssemblyUtil(callback_url)
-    pool = multiprocessing.Pool(processes=2)
-    jobs = []
+    # pool = multiprocessing.Pool(processes=2)
+    # jobs = []
+    results = []
     for ref in refs:
-        jobs.append(pool.apply_async(fetch_assembly, (assembly_util, ref)))
-    return [j.get() for j in jobs]
+        results.append(fetch_assembly(assembly_util, ref))
+    # for ref in refs:
+    #     jobs.append(pool.apply_async(fetch_assembly, (assembly_util, ref)))
+    # return [j.get() for j in jobs]
+    return results
 
 
 def fetch_assembly(assembly_util, ref):
     """ Fetch a single assembly file with a workspace reference """
-    return assembly_util.get_assembly_as_fasta({'ref': ref})['path']
+    x = assembly_util.get_assembly_as_fasta({'ref': ref})
+    print('!?!?!?', x)
+    return x['path']
